@@ -664,6 +664,12 @@ static void move_to_eol(VteTerminal *vte, select_info *select) {
     g_free(codepoints);
 }
 
+static void move_to_selection(VteTerminal *vte) {
+    long col, row;
+    vte_terminal_get_selection_position(vte, &col, &row);
+    vte_terminal_set_cursor_position(vte, col, row);
+}
+
 template<typename F>
 static void move_forward(VteTerminal *vte, select_info *select, F is_word) {
     long cursor_col, cursor_row;
@@ -875,10 +881,12 @@ gboolean key_press_cb(VteTerminal *vte, GdkEventKey *event, keybind_info *info) 
             case GDK_KEY_n:
                 vte_terminal_search_find_next(vte);
                 vte_terminal_copy_primary(vte);
+                move_to_selection(vte);
                 break;
             case GDK_KEY_N:
                 vte_terminal_search_find_previous(vte);
                 vte_terminal_copy_primary(vte);
+                move_to_selection(vte);
                 break;
             case GDK_KEY_u:
                 search(vte, url_regex, false);
